@@ -1,46 +1,76 @@
-import { framer, CanvasNode } from "framer-plugin"
-import { useState, useEffect } from "react"
-import "./App.css"
+import { framer } from "framer-plugin";
+
+import { Config } from "./Config";
+import { useEffect, useState } from "react";
+import "./App.css";
+import { GetFlags } from "./GetFlags";
+import { GbLogo } from "./Logo";
+
+export type ConfigType = {
+  clientKey?: string | null;
+  apiHost?: string | null;
+};
 
 framer.showUI({
-    position: "top right",
-    width: 240,
-    height: 95,
-})
+  position: "center",
+  width: 320,
+  resizable: true,
+});
 
-function useSelection() {
-    const [selection, setSelection] = useState<CanvasNode[]>([])
-
-    useEffect(() => {
-        return framer.subscribeToSelection(setSelection)
-    }, [])
-
-    return selection
+function parseGrowthBookUrl(url: string | null | undefined) {
+  if (url === "https://cdn.growthbook.io") {
+    return "https://app.growthbook.io";
+  }
+  return url; // Need to add field for self-hosted
 }
 
 export function App() {
-    const selection = useSelection()
-    const layer = selection.length === 1 ? "layer" : "layers"
+  const [config, updateConfig] = useState<ConfigType>({
+    clientKey: "",
+    apiHost: "",
+  });
 
-    const handleAddSvg = async () => {
-        await framer.addSVG({
-            svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="#999" d="M20 0v8h-8L4 0ZM4 8h8l8 8h-8v8l-8-8Z"/></svg>`,
-            name: "Logo.svg",
-        })
-    }
+  useEffect(() => {
+    const getData = async () => {
+      const clientKey = await framer.getPluginData("clientKey");
+      const apiHost = await framer.getPluginData("apiHost");
+      updateConfig({ clientKey, apiHost });
+    };
 
-    return (
-        <main>
-            <p>
-                Welcome! Check out the{" "}
-                <a href="https://framer.com/developers/plugins/introduction" target="_blank">
-                    Docs
-                </a>{" "}
-                to start. You have {selection.length} {layer} selected.
+    getData();
+  }, []);
+
+  return (
+    <main>
+      <div className="gb-container gb-intro">
+        <GbLogo />
+        {!config.clientKey ? (
+          <>
+            <p className="gb-intro-headline">
+              Feature flag and A/B test your content. Update your settings to
+              get started.
             </p>
-            <button className="framer-button-primary" onClick={handleAddSvg}>
-                Insert Logo
-            </button>
-        </main>
-    )
+            <p className="gb-intro-text">
+              Don't have an account?{" "}
+              <a href="https://growthbook.io">Get started.</a>
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="gb-intro-headline">
+              Welcome back! What are you going to A/B test today?
+            </p>
+            <p className="gb-intro-text">
+              <a target="_blank" href={`${parseGrowthBookUrl(config.apiHost)}`}>
+                Go to your GrowthBook dashboard.
+              </a>
+            </p>
+          </>
+        )}
+      </div>
+
+      <Config config={config} updateConfig={updateConfig} />
+      <GetFlags config={config} />
+    </main>
+  );
 }
