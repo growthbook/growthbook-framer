@@ -11,8 +11,8 @@ import {
 } from "@growthbook/growthbook/plugins";
 
 interface Props {
-  apiHost: string;
-  clientKey: string;
+  apiHost?: string;
+  clientKey?: string;
   flagKey?: string;
   variants?: React.ReactNode[];
 }
@@ -94,7 +94,7 @@ const GbLogo = () => (
 );
 
 /**
- * @framerDisableUnlink
+ 
  */
 export default function GrowthBook(props: Props) {
   const [growthbook, setGrowthbook] = useState<GB | null>(null);
@@ -111,6 +111,7 @@ export default function GrowthBook(props: Props) {
         }
 
         const gb = new GB({
+          apiHost: props.apiHost,
           clientKey: props.clientKey,
           plugins: [
             autoAttributesPlugin(),
@@ -143,20 +144,10 @@ export default function GrowthBook(props: Props) {
         gbRef.current = null;
       }
     };
-  }, [props.clientKey, props.enableDevMode]);
+  }, [props.clientKey, props.apiHost]);
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        Loading...
-      </div>
-    );
+    return <></>;
   }
 
   if (error) {
@@ -170,7 +161,7 @@ export default function GrowthBook(props: Props) {
   if (!growthbook) {
     return null;
   }
-
+  console.log(growthbook);
   return (
     <GrowthBookProvider growthbook={growthbook}>
       <TestContent {...props} />
@@ -185,6 +176,7 @@ interface TestContentProps extends Props {
 
 function TestContent({ flagKey, variants = [] }: TestContentProps) {
   const variant = useFeatureValue<number | null>(flagKey || "", null);
+  console.log("🚀 ~ functionTestContent(flagKey,variants ~ variant:", variant);
 
   if (variant === null) return <></>;
 
@@ -192,8 +184,8 @@ function TestContent({ flagKey, variants = [] }: TestContentProps) {
     return (
       <div
         style={{
-          width: 200,
-          height: 200,
+          width: 400,
+          height: 225,
           color: "var(--framer-fresco-panelTitle-color)",
           border: "3px dotted currentColor",
           borderRadius: "3px",
@@ -210,7 +202,7 @@ function TestContent({ flagKey, variants = [] }: TestContentProps) {
           }}
         >
           <GbLogo />
-          <p>Connect a component</p>
+          <p>Add components for each variant</p>
         </div>
       </div>
     );
@@ -221,12 +213,6 @@ function TestContent({ flagKey, variants = [] }: TestContentProps) {
 
 // Property Controls for Framer UI
 addPropertyControls(GrowthBook, {
-  apiHost: {
-    type: ControlType.String,
-    hidden() {
-      return true;
-    },
-  },
   clientKey: {
     type: ControlType.String,
     title: "GrowthBook Key",

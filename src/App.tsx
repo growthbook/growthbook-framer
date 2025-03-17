@@ -14,10 +14,11 @@ export type ConfigType = {
 framer.showUI({
   position: "center",
   width: 320,
-  resizable: true,
+  height: 706,
+  resizable: false,
 });
 
-function parseGrowthBookUrl(url: string | null | undefined) {
+export function parseGrowthBookUrl(url: string | null | undefined) {
   if (url === "https://cdn.growthbook.io") {
     return "https://app.growthbook.io";
   }
@@ -39,6 +40,11 @@ export function App() {
 
     getData();
   }, []);
+
+  framer.setCustomCode({
+    html: ``,
+    location: "headStart",
+  });
 
   return (
     <main>
@@ -62,7 +68,7 @@ export function App() {
             </p>
             <p className="gb-intro-text">
               <a target="_blank" href={`${parseGrowthBookUrl(config.apiHost)}`}>
-                Go to your GrowthBook dashboard.
+                Go to your GrowthBook dashboard &rarr;
               </a>
             </p>
           </>

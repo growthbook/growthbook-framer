@@ -81,6 +81,7 @@ export function GetFlags({ config }: { config: ConfigType }) {
   return features.length ? (
     <div className="gb-container">
       <h2>Features</h2>
+
       <div>
         <div className="gb-label-container">
           <label htmlFor="feature-select" className="gb-label">
@@ -121,11 +122,15 @@ export function GetFlags({ config }: { config: ConfigType }) {
         </select>
       </div>
 
-      <div style={}>
-        <p>Need a new feature flag?</p>
-        <a target="_blank" href={`https://app.growthbook.io`}>
-          Create New Feature
-        </a>
+      <div>
+        <p className="gb-info-text">
+          Missing a feature flag?{" "}
+          <a target="_blank" href={`https://app.growthbook.io`}>
+            {/* TODO: Add self-hosted support */}
+            Create one in GrowthBook
+          </a>{" "}
+          and refresh.
+        </p>
       </div>
 
       {selectedFeature && (

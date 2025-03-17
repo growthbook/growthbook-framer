@@ -54,6 +54,10 @@ label {
   border-top: 1px solid var(--framer-color-divider);
 }
 
+.gb-container:last-of-type {
+  padding-block-end: 0;
+}
+
 .gb-container .gb-label-container {
   display: flex;
   align-items: center;
@@ -96,7 +100,7 @@ label {
   justify-content: center;
   background-color: transparent;
   padding: 4px;
-  border-radius: 2px;
+  border-radius: 4px;
   height: auto;
   transition: all 0.2s ease;
 

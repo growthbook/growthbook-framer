@@ -23,9 +23,11 @@ export function AddComponent({ config, feature }: AddComponentProps) {
   };
 
   return (
-    <div>
+    <div className="gb-container">
+      <h2>Experiment</h2>
+      <p>Link to components to A/B test your content.</p>
       <button onClick={addComponent} className="framer-button-primary">
-        Add Component
+        Add to Canvas
       </button>
     </div>
   );
