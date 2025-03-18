@@ -1,7 +1,11 @@
-import { addPropertyControls, ControlType, RenderTarget } from "framer";
-import { useEffect, useState } from "react";
-import React from "react";
 import { GrowthBook as GrowthBookSDK } from "@growthbook/growthbook";
+import {
+  addPropertyControls,
+  ControlType,
+  isBrowser,
+  RenderTarget,
+} from "framer";
+import React, { useEffect, useState } from "react";
 
 // Extend Window interface to include GrowthBook types
 declare global {
@@ -12,16 +16,16 @@ declare global {
 }
 
 interface Props {
-  flagKey?: string;
-  variants?: React.ReactNode[];
+  flagKey: string;
+  variants: React.ReactNode[];
   variantCount: number;
 }
 
-const FlaskIcon = () => (
+const FlaskIcon = ({ width = 32, height = 32 }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="32"
-    height="32"
+    width={width}
+    height={height}
     fill="currentColor"
     viewBox="0 0 256 256"
   >
@@ -29,39 +33,72 @@ const FlaskIcon = () => (
   </svg>
 );
 
+const Badge = ({ current, total }: { current: number; total: number }) => {
+  return (
+    <div
+      style={{
+        backgroundColor: "var(--framer-fresco-panelBackground-color)",
+        padding: "2px 6px",
+        borderRadius: "3px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        position: "absolute",
+        top: 0,
+        right: 0,
+        fontSize: "12px",
+        lineHeight: "16px",
+        fontWeight: "500",
+      }}
+    >
+      <FlaskIcon width={12} height={12} />
+      {current} / {total}
+    </div>
+  );
+};
+
 /**
- 
+ * @framerDisableUnlink
  */
 export default function GrowthBook(props: Props) {
   const [variant, setVariant] = useState<number>(0);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const isCanvas = RenderTarget.current() === RenderTarget.canvas;
   const isThumbnail = RenderTarget.current() === RenderTarget.thumbnail;
 
   useEffect(() => {
-    if (isCanvas || isThumbnail || !props.flagKey) return;
+    if (!isCanvas && !isThumbnail && props.flagKey && isBrowser) {
+      setIsMounted(true);
 
-    // Update variant whenever GrowthBook instance or data changes
-    const updateVariant = () => {
-      if (window._growthbook) {
-        setVariant(window._growthbook.getFeatureValue(props.flagKey!, 0));
+      // Check if we're in preview mode
+      const isPreview = window.location.hostname.includes("framercanvas.com");
+      if (isPreview) {
+        setIsLoaded(true);
+        return;
       }
-    };
 
-    // Initial setup
-    if (window._growthbook) {
-      updateVariant();
+      const updateVariant = () => {
+        if (window._growthbook) {
+          setVariant(window._growthbook.getFeatureValue(props.flagKey!, 0));
+          setIsLoaded(true);
+        }
+      };
+
+      // Initial setup
+      if (window._growthbook) {
+        updateVariant();
+      }
+
+      window.growthbook_queue = window.growthbook_queue || [];
+      window.growthbook_queue.push(updateVariant);
+
+      document.addEventListener("growthbookdata", updateVariant);
+
+      return () => {
+        document.removeEventListener("growthbookdata", updateVariant);
+      };
     }
-
-    // Set up a queue to handle GrowthBook initialization
-    window.growthbook_queue = window.growthbook_queue || [];
-    window.growthbook_queue.push(updateVariant);
-
-    // Listen for feature flag updates
-    document.addEventListener("growthbookdata", updateVariant);
-
-    return () => {
-      document.removeEventListener("growthbookdata", updateVariant);
-    };
   }, [props.flagKey, isCanvas, isThumbnail]);
 
   // Show simplified version in thumbnail
@@ -77,7 +114,12 @@ export default function GrowthBook(props: Props) {
   if (isCanvas) {
     // If we have variants, just show the first one
     if (props.variants?.length) {
-      return props.variants[0];
+      return (
+        <div style={{ position: "relative", padding: 12 }}>
+          {props.variants[0]}
+          <Badge current={props.variants.length} total={props.variantCount} />
+        </div>
+      );
     }
 
     // Empty state with instructions
@@ -85,7 +127,7 @@ export default function GrowthBook(props: Props) {
       <div
         style={{
           width: "100%",
-          minHeight: "100px",
+          minHeight: "250px",
           color: "var(--framer-color-text-tertiary)",
           padding: "16px",
           display: "flex",
@@ -108,8 +150,8 @@ export default function GrowthBook(props: Props) {
               <div
                 key={i}
                 style={{
-                  width: "100px",
-                  height: "100px",
+                  width: "250px",
+                  height: "250px",
                   backgroundColor: "var(--framer-fresco-panelBackground-color)",
                   display: "flex",
                   alignItems: "center",
@@ -127,18 +169,24 @@ export default function GrowthBook(props: Props) {
     );
   }
 
-  // Runtime view - return null if GrowthBook isn't ready
-  if (!window._growthbook) {
-    return null;
-  }
-
-  // Runtime view - render the appropriate variant
+  // Runtime view
   const { variants = [] } = props;
   if (!variants.length || !props.flagKey) {
     return null;
   }
 
-  return variants[variant] || variants[0];
+  return (
+    <div
+      style={{
+        opacity: isLoaded ? 1 : 0,
+        transition: "opacity 0.2s ease-in",
+      }}
+    >
+      {!isMounted || !window._growthbook
+        ? variants[0]
+        : variants[variant] || variants[0]}
+    </div>
+  );
 }
 
 // Property Controls for Framer UI
