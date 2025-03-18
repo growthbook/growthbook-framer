@@ -37,7 +37,10 @@ const Badge = ({ current, total }: { current: number; total: number }) => {
   return (
     <div
       style={{
-        backgroundColor: "var(--framer-fresco-panelBackground-color)",
+        backgroundColor:
+          "var(--framer-fresco-toolbarButtonBackground-color, #f3f3f3)",
+        color:
+          "var(--framer-fresco-toolbarSettingsButtonTextSites-color, #333333)",
         padding: "2px 6px",
         borderRadius: "3px",
         display: "flex",
