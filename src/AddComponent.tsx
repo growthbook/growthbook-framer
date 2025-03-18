@@ -8,7 +8,6 @@ interface AddComponentProps {
 }
 
 export function AddComponent({ config, feature }: AddComponentProps) {
-  console.log(`${config.apiHost}/features/${feature.name}`);
   const addComponent = async () => {
     await framer.addComponentInstance({
       url: "https://framer.com/m/GrowthBook-FBIs.js",
@@ -17,6 +16,7 @@ export function AddComponent({ config, feature }: AddComponentProps) {
           apiHost: config.apiHost,
           clientKey: config.clientKey,
           flagKey: feature.name,
+          variantCount: feature.variationCount || 1,
         },
       },
     });

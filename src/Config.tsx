@@ -73,19 +73,6 @@ export function Config({ config, updateConfig }: ConfigProps) {
   return (
     <div className="gb-container">
       <h2>Settings</h2>
-      <div>
-        <label htmlFor="api-host" className="gb-label">
-          API Host
-        </label>
-        <input
-          id="api-host"
-          type="text"
-          placeholder="https://cdn.growthbook.io"
-          value={localConfig.apiHost || ""}
-          onChange={(e) => handleInputChange("apiHost", e.target.value)}
-          className="gb-input"
-        />
-      </div>
 
       <div>
         <label htmlFor="client-key" className="gb-label">
@@ -99,6 +86,19 @@ export function Config({ config, updateConfig }: ConfigProps) {
           onChange={(e) => handleInputChange("clientKey", e.target.value)}
           className="gb-input"
           ref={inputRef}
+        />
+      </div>
+      <div>
+        <label htmlFor="api-host" className="gb-label">
+          API Host
+        </label>
+        <input
+          id="api-host"
+          type="text"
+          placeholder="https://cdn.growthbook.io"
+          value={localConfig.apiHost || ""}
+          onChange={(e) => handleInputChange("apiHost", e.target.value)}
+          className="gb-input"
         />
       </div>
 

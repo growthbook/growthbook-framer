@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { GetFlags } from "./GetFlags";
 import { GbLogo } from "./Logo";
+import { parseGrowthBookUrl } from "./utils";
 
 export type ConfigType = {
   clientKey?: string | null;
@@ -17,13 +18,6 @@ framer.showUI({
   height: 706,
   resizable: false,
 });
-
-export function parseGrowthBookUrl(url: string | null | undefined) {
-  if (url === "https://cdn.growthbook.io") {
-    return "https://app.growthbook.io";
-  }
-  return url; // Need to add field for self-hosted
-}
 
 export function App() {
   const [config, updateConfig] = useState<ConfigType>({
@@ -41,10 +35,25 @@ export function App() {
     getData();
   }, []);
 
-  framer.setCustomCode({
-    html: ``,
-    location: "headStart",
-  });
+  // Only inject the script if we have valid config
+  useEffect(() => {
+    async function setCode() {
+      if (config.clientKey) {
+        const script = `<script async data-api-host="${config.apiHost}" data-client-key="${config.clientKey}" src="https://cdn.jsdelivr.net/npm/@growthbook/growthbook/dist/bundles/auto.min.js"></script>`;
+        const customCode = await framer.getCustomCode();
+        console.log("customCode", customCode);
+        if (customCode.headStart.html === script) {
+          console.log("script already exists");
+          return;
+        }
+        framer.setCustomCode({
+          html: script,
+          location: "headStart",
+        });
+      }
+    }
+    setCode();
+  }, [config.clientKey, config.apiHost]);
 
   return (
     <main>

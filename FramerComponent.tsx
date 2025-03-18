@@ -1,95 +1,31 @@
-import { addPropertyControls, ControlType } from "framer";
-import {
-  GrowthBook as GB,
-  GrowthBookProvider,
-  useFeatureValue,
-} from "@growthbook/growthbook-react";
-import { useEffect, useState, useRef } from "react";
-import {
-  autoAttributesPlugin,
-  thirdPartyTrackingPlugin,
-} from "@growthbook/growthbook/plugins";
+import { addPropertyControls, ControlType, RenderTarget } from "framer";
+import { useEffect, useState } from "react";
+import React from "react";
+import { GrowthBook as GrowthBookSDK } from "@growthbook/growthbook";
 
-interface Props {
-  apiHost?: string;
-  clientKey?: string;
-  flagKey?: string;
-  variants?: React.ReactNode[];
+// Extend Window interface to include GrowthBook types
+declare global {
+  interface Window {
+    growthbook_queue?: ((gb: GrowthBookSDK) => void)[];
+    _growthbook?: GrowthBookSDK;
+  }
 }
 
-const trackingOptions = {
-  additionalCallback: (
-    experiment: { key: string },
-    result: { key: string }
-  ) => {
-    console.log("Experiment Viewed", {
-      experimentId: experiment.key,
-      variationId: result.key,
-    });
-  },
-};
+interface Props {
+  flagKey?: string;
+  variants?: React.ReactNode[];
+  variantCount: number;
+}
 
-const GbLogo = () => (
+const FlaskIcon = () => (
   <svg
-    width="20"
-    height="20"
-    viewBox="0 0 512 512"
-    fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    width="32"
+    height="32"
+    fill="currentColor"
+    viewBox="0 0 256 256"
   >
-    <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-      d="M167.309 183.179L512 0C512 0 479.506 26.9984 480.934 85.4405C482.456 147.723 512 170.883 512 170.883L471.497 153.454L154.422 270.686C154.422 270.686 146.724 250.316 146.599 234.96C146.271 197.08 167.309 183.179 167.309 183.179Z"
-      fill="url(#paint0_linear_98_108)"
-    />
-    <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-      d="M93.9888 302.928L470.586 172.823C470.586 172.823 438.09 199.821 439.52 258.265C441.043 320.547 470.586 343.706 470.586 343.706L417.974 324.576L79.9531 387.419C79.9531 387.419 73.3977 368.642 73.2781 354.711C72.953 316.828 93.9888 302.928 93.9888 302.928Z"
-      fill="url(#paint1_linear_98_108)"
-    />
-    <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-      d="M20.7146 408.439L418.063 341.117C418.063 341.117 385.567 368.116 386.995 426.557C388.52 488.841 418.063 512 418.063 512H23.6814C23.6814 512 0.349653 498.615 0.00373409 458.278C-0.321558 420.396 20.7146 408.439 20.7146 408.439Z"
-      fill="url(#paint2_linear_98_108)"
-    />
-    <defs>
-      <linearGradient
-        id="paint0_linear_98_108"
-        x1="283.61"
-        y1="3.28478e-07"
-        x2="300.663"
-        y2="215.282"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop offset="0.176783" stop-color="#06B8F4" />
-        <stop offset="1" stop-color="#349DCD" />
-      </linearGradient>
-      <linearGradient
-        id="paint1_linear_98_108"
-        x1="271.93"
-        y1="172.823"
-        x2="271.93"
-        y2="387.419"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop stop-color="#2076FF" />
-        <stop offset="1" stop-color="#024CB5" />
-      </linearGradient>
-      <linearGradient
-        id="paint2_linear_98_108"
-        x1="209.031"
-        y1="341.117"
-        x2="209.031"
-        y2="512"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop stop-color="#7B45EA" />
-        <stop offset="1" stop-color="#43269A" />
-      </linearGradient>
-    </defs>
+    <path d="M221.69,199.77,160,96.92V40h8a8,8,0,0,0,0-16H88a8,8,0,0,0,0,16h8V96.92L34.31,199.77A16,16,0,0,0,48,224H208a16,16,0,0,0,13.72-24.23ZM110.86,103.25A7.93,7.93,0,0,0,112,99.14V40h32V99.14a7.93,7.93,0,0,0,1.14,4.11L183.36,167c-12,2.37-29.07,1.37-51.75-10.11-15.91-8.05-31.05-12.32-45.22-12.81ZM48,208l28.54-47.58c14.25-1.74,30.31,1.85,47.82,10.72,19,9.61,35,12.88,48,12.88a69.89,69.89,0,0,0,19.55-2.7L208,208Z"></path>
   </svg>
 );
 
@@ -97,115 +33,109 @@ const GbLogo = () => (
  
  */
 export default function GrowthBook(props: Props) {
-  const [growthbook, setGrowthbook] = useState<GB | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const gbRef = useRef<GB | null>(null);
+  const [variant, setVariant] = useState<number>(0);
+  const isCanvas = RenderTarget.current() === RenderTarget.canvas;
+  const isThumbnail = RenderTarget.current() === RenderTarget.thumbnail;
+
   useEffect(() => {
-    async function initGB() {
-      try {
-        if (!props.clientKey) {
-          setError("Client key is required");
-          setIsLoading(false);
-          return;
-        }
+    if (isCanvas || isThumbnail || !props.flagKey) return;
 
-        const gb = new GB({
-          apiHost: props.apiHost,
-          clientKey: props.clientKey,
-          plugins: [
-            autoAttributesPlugin(),
-            thirdPartyTrackingPlugin(trackingOptions),
-          ],
-          enableDevMode: true,
-        });
-
-        await gb.init({ streaming: true });
-
-        gbRef.current = gb;
-        setGrowthbook(gb);
-        setError(null);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to initialize GrowthBook"
-        );
-        console.error("GrowthBook initialization error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    setIsLoading(true);
-    initGB();
-
-    return () => {
-      if (gbRef.current) {
-        gbRef.current.destroy();
-        gbRef.current = null;
+    // Update variant whenever GrowthBook instance or data changes
+    const updateVariant = () => {
+      if (window._growthbook) {
+        setVariant(window._growthbook.getFeatureValue(props.flagKey!, 0));
       }
     };
-  }, [props.clientKey, props.apiHost]);
 
-  if (isLoading) {
-    return <></>;
-  }
+    // Initial setup
+    if (window._growthbook) {
+      updateVariant();
+    }
 
-  if (error) {
+    // Set up a queue to handle GrowthBook initialization
+    window.growthbook_queue = window.growthbook_queue || [];
+    window.growthbook_queue.push(updateVariant);
+
+    // Listen for feature flag updates
+    document.addEventListener("growthbookdata", updateVariant);
+
+    return () => {
+      document.removeEventListener("growthbookdata", updateVariant);
+    };
+  }, [props.flagKey, isCanvas, isThumbnail]);
+
+  // Show simplified version in thumbnail
+  if (isThumbnail) {
     return (
-      <div>
-        <div style={{ color: "red", fontSize: 12 }}>{error}</div>
+      <div style={{ padding: 8 }}>
+        <FlaskIcon />
       </div>
     );
   }
 
-  if (!growthbook) {
-    return null;
-  }
-  console.log(growthbook);
-  return (
-    <GrowthBookProvider growthbook={growthbook}>
-      <TestContent {...props} />
-    </GrowthBookProvider>
-  );
-}
+  // Show design-time states in canvas
+  if (isCanvas) {
+    // If we have variants, just show the first one
+    if (props.variants?.length) {
+      return props.variants[0];
+    }
 
-interface TestContentProps extends Props {
-  flagKey?: string;
-  variants?: React.ReactNode[];
-}
-
-function TestContent({ flagKey, variants = [] }: TestContentProps) {
-  const variant = useFeatureValue<number | null>(flagKey || "", null);
-  console.log("🚀 ~ functionTestContent(flagKey,variants ~ variant:", variant);
-
-  if (variant === null) return <></>;
-
-  if (!variants.length) {
+    // Empty state with instructions
     return (
       <div
         style={{
-          width: 400,
-          height: 225,
-          color: "var(--framer-fresco-panelTitle-color)",
-          border: "3px dotted currentColor",
-          borderRadius: "3px",
-          padding: "12px",
-          display: "grid",
-          placeItems: "center",
+          width: "100%",
+          minHeight: "100px",
+          color: "var(--framer-color-text-tertiary)",
+          padding: "16px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "12px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "3px",
-          }}
-        >
-          <GbLogo />
-          <p>Add components for each variant</p>
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              margin: "12px 0",
+              justifyContent: "center",
+            }}
+          >
+            {Array.from({ length: props.variantCount }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  backgroundColor: "var(--framer-fresco-panelBackground-color)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "12px",
+                }}
+              ></div>
+            ))}
+          </div>
+          <p>
+            Add {props.variantCount} variants for <code>{props.flagKey}</code>
+          </p>
         </div>
       </div>
     );
+  }
+
+  // Runtime view - return null if GrowthBook isn't ready
+  if (!window._growthbook) {
+    return null;
+  }
+
+  // Runtime view - render the appropriate variant
+  const { variants = [] } = props;
+  if (!variants.length || !props.flagKey) {
+    return null;
   }
 
   return variants[variant] || variants[0];
@@ -213,13 +143,6 @@ function TestContent({ flagKey, variants = [] }: TestContentProps) {
 
 // Property Controls for Framer UI
 addPropertyControls(GrowthBook, {
-  clientKey: {
-    type: ControlType.String,
-    title: "GrowthBook Key",
-    hidden() {
-      return true;
-    },
-  },
   flagKey: {
     type: ControlType.String,
     title: "Feature Flag",
@@ -231,6 +154,11 @@ addPropertyControls(GrowthBook, {
     },
     title: "Variants",
     description: "Add components for each variant",
-    maxCount: 2,
+  },
+  variantCount: {
+    type: ControlType.Number,
+    hidden() {
+      return true;
+    },
   },
 });
