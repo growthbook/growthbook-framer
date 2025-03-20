@@ -178,6 +178,7 @@ export default function GrowthBook(props: Props) {
     return null;
   }
 
+  // TODO? Add support for null states/kill switches?
   return (
     <div
       style={{

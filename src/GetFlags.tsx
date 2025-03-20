@@ -32,7 +32,7 @@ export function GetFlags({ config }: { config: ConfigType }) {
           }`
         );
         const data = (await res.json()) as FeatureApiResponse;
-
+        // Should we disable non-numeric flags, as they won't be compatible with the plugin/component?
         const processedFeatures = Object.entries(data.features ?? {}).map(
           ([name, feature]) => {
             const hasExperiment =
