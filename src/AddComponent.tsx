@@ -9,7 +9,7 @@ interface AddComponentProps {
 
 export function AddComponent({ config, feature }: AddComponentProps) {
   const addComponent = async () => {
-    await framer.addComponentInstance({
+    const node = await framer.addComponentInstance({
       url: "https://framer.com/m/GrowthBook-FBIs.js",
       attributes: {
         controls: {
@@ -20,6 +20,7 @@ export function AddComponent({ config, feature }: AddComponentProps) {
         },
       },
     });
+    await framer.zoomIntoView(node.id);
     await framer.closePlugin("Component added successfully", {
       variant: "success",
     });

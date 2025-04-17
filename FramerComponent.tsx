@@ -38,8 +38,8 @@ const Badge = ({ current, total }: { current: number; total: number }) => {
   return (
     <div
       style={{
-        backgroundColor: "#4400EE0F",
-        color: "#1F0099B0",
+        backgroundColor: "#2400B7A8",
+        color: "#fff",
         padding: "2px 6px",
         borderRadius: "3px",
         display: "flex",
@@ -132,18 +132,22 @@ export default function GrowthBook(props: Props) {
     return (
       <div
         style={{
-          width: "240px",
+          width: "360px",
           padding: "16px",
           borderRadius: "6px",
           border: "1px dashed #00062E33",
           display: "flex",
           flexDirection: "column",
           gap: 4,
-          backgroundColor: "#0000330F",
+          backgroundColor: "#F0F0F3",
+          color: "#000",
         }}
       >
         <p>
-          <strong>0 of {props.variantCount} components connected</strong>
+          <strong>
+            {props.control.length + props.variants.length} of{" "}
+            {props.variantCount} components connected
+          </strong>
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
