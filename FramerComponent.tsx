@@ -19,6 +19,7 @@ interface Props {
   flagKey: string;
   variants: React.ReactNode[];
   variantCount: number;
+  control: string;
 }
 
 const FlaskIcon = ({ width = 32, height = 32 }) => (
@@ -37,10 +38,8 @@ const Badge = ({ current, total }: { current: number; total: number }) => {
   return (
     <div
       style={{
-        backgroundColor:
-          "var(--framer-fresco-toolbarButtonBackground-color, #f3f3f3)",
-        color:
-          "var(--framer-fresco-toolbarSettingsButtonTextSites-color, #333333)",
+        backgroundColor: "#4400EE0F",
+        color: "#1F0099B0",
         padding: "2px 6px",
         borderRadius: "3px",
         display: "flex",
@@ -65,6 +64,7 @@ const Badge = ({ current, total }: { current: number; total: number }) => {
  */
 export default function GrowthBook(props: Props) {
   const [variant, setVariant] = useState<number>(0);
+
   const [isMounted, setIsMounted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const isCanvas = RenderTarget.current() === RenderTarget.canvas;
@@ -116,11 +116,14 @@ export default function GrowthBook(props: Props) {
   // Show design-time states in canvas
   if (isCanvas) {
     // If we have variants, just show the first one
-    if (props.variants?.length) {
+    if (props.control.length) {
       return (
         <div style={{ position: "relative", padding: 12 }}>
-          {props.variants[0]}
-          <Badge current={props.variants.length} total={props.variantCount} />
+          {props.control[0]}
+          <Badge
+            current={props.control.length + props.variants.length}
+            total={props.variantCount}
+          />
         </div>
       );
     }
@@ -129,43 +132,33 @@ export default function GrowthBook(props: Props) {
     return (
       <div
         style={{
-          width: "100%",
-          minHeight: "250px",
-          color: "var(--framer-color-text-tertiary)",
+          width: "240px",
           padding: "16px",
+          borderRadius: "6px",
+          border: "1px dashed #00062E33",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "12px",
+          gap: 4,
+          backgroundColor: "#0000330F",
         }}
       >
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              gap: "8px",
-              margin: "12px 0",
-              justifyContent: "center",
-            }}
-          >
-            {Array.from({ length: props.variantCount }).map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: "250px",
-                  height: "250px",
-                  backgroundColor: "var(--framer-fresco-panelBackground-color)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                }}
-              ></div>
-            ))}
-          </div>
+        <p>
+          <strong>0 of {props.variantCount} components connected</strong>
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <p>
-            Add {props.variantCount} variants for <code>{props.flagKey}</code>
+            <strong>1. Create</strong> a Framer component for each variation in
+            your GrowthBook Feature Flag experiment.
+          </p>
+          <p>
+            <strong>2. Connect</strong> the component for your Control variation
+            by dragging the handle on this container to your component.
+          </p>
+          <p>
+            <strong>3. Connect other components</strong> for each variation in
+            the order they should appear. Rearrange the order in the sidebar
+            panel.
           </p>
         </div>
       </div>
@@ -197,7 +190,11 @@ export default function GrowthBook(props: Props) {
 addPropertyControls(GrowthBook, {
   flagKey: {
     type: ControlType.String,
-    title: "Feature Flag",
+    title: "Feature",
+  },
+  control: {
+    type: ControlType.ComponentInstance,
+    title: "Control",
   },
   variants: {
     type: ControlType.Array,
@@ -205,7 +202,7 @@ addPropertyControls(GrowthBook, {
       type: ControlType.ComponentInstance,
     },
     title: "Variants",
-    description: "Add components for each variant",
+    description: "Connect a component for each experiment variation.",
   },
   variantCount: {
     type: ControlType.Number,

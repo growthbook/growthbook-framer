@@ -1,10 +1,18 @@
 import { framer } from "framer-plugin";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "./App.css";
-import { Config } from "./Config";
-import { GetFlags } from "./GetFlags";
-import { GbLogo } from "./Logo";
+import { Settings } from "./Settings";
+import { ConnectExperiments } from "./ConnectExperiments";
+import {
+  Cog,
+  ExternalLink,
+  Flask,
+  GbLogo,
+  InfoFilled,
+} from "./components/Icons";
 import { parseGrowthBookUrl } from "./utils";
+import { Accordion } from "./components/Accordion";
+import { GetStarted } from "./GetStarted";
 
 export type ConfigType = {
   clientKey?: string | null;
@@ -19,6 +27,7 @@ framer.showUI({
 });
 
 export function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [config, updateConfig] = useState<ConfigType>({
     clientKey: "",
     apiHost: "",
@@ -26,9 +35,14 @@ export function App() {
 
   useEffect(() => {
     const getData = async () => {
-      const clientKey = await framer.getPluginData("clientKey");
-      const apiHost = await framer.getPluginData("apiHost");
+      const [clientKey, apiHost] = await Promise.all([
+        framer.getPluginData("clientKey"),
+        framer.getPluginData("apiHost"),
+      ]);
+
+      // Update both states in a single render
       updateConfig({ clientKey, apiHost });
+      setIsLoading(false);
     };
 
     getData();
@@ -50,39 +64,59 @@ export function App() {
       }
     }
     setCode();
-  }, [config.clientKey, config.apiHost]);
+  }, [config.clientKey]); // Only depend on clientKey since that's what triggers the script injection
+
+  const items = useMemo(
+    () => [
+      {
+        id: "1",
+        title: "Settings",
+        content: <Settings config={config} updateConfig={updateConfig} />,
+        icon: <Cog />,
+      },
+      {
+        id: "2",
+        title: "Get Started",
+        content: <GetStarted />,
+        icon: <InfoFilled />,
+      },
+      {
+        id: "3",
+        title: "Connect Your Experiments",
+        content: <ConnectExperiments config={config} />,
+        icon: <Flask />,
+      },
+    ],
+    [config]
+  ); // Only recreate when config changes
+
+  if (isLoading) {
+    return (
+      <main>
+        <div className="gb-container gb-intro">
+          <GbLogo />
+          <p className="gb-intro-headline">Loading...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main>
       <div className="gb-container gb-intro">
         <GbLogo />
-        {!config.clientKey ? (
-          <>
-            <p className="gb-intro-headline">
-              Feature flag and A/B test your content. Update your settings to
-              get started.
-            </p>
-            <p className="gb-intro-text">
-              Don't have an account?{" "}
-              <a href="https://growthbook.io">Get started.</a>
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="gb-intro-headline">
-              Welcome back! What are you going to A/B test today?
-            </p>
-            <p className="gb-intro-text">
-              <a target="_blank" href={`${parseGrowthBookUrl(config.apiHost)}`}>
-                Go to your GrowthBook dashboard &rarr;
-              </a>
-            </p>
-          </>
-        )}
+        <p className="gb-intro-headline">What will you A/B test today?</p>
+        <p className="gb-intro-text">
+          <a
+            target="_blank"
+            href={`${parseGrowthBookUrl(config.apiHost)}`}
+            className="gb-link-button"
+          >
+            Open GrowthBook <ExternalLink />
+          </a>
+        </p>
       </div>
-
-      <Config config={config} updateConfig={updateConfig} />
-      <GetFlags config={config} />
+      <Accordion items={items} defaultOpenId={config.clientKey ? "3" : "1"} />
     </main>
   );
 }

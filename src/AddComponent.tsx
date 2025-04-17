@@ -1,6 +1,6 @@
 import { framer } from "framer-plugin";
 import { ConfigType } from "./App";
-import { Feature } from "./GetFlags";
+import { Feature } from "./ConnectExperiments";
 
 interface AddComponentProps {
   config: ConfigType;
@@ -20,15 +20,14 @@ export function AddComponent({ config, feature }: AddComponentProps) {
         },
       },
     });
+    await framer.closePlugin("Component added successfully", {
+      variant: "success",
+    });
   };
 
   return (
-    <div className="gb-container">
-      <h2>Experiment</h2>
-      <p>Link to components to A/B test your content.</p>
-      <button onClick={addComponent} className="framer-button-primary">
-        Add to Canvas
-      </button>
-    </div>
+    <button onClick={addComponent} className="framer-button-primary">
+      Add to Canvas
+    </button>
   );
 }

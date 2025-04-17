@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { framer } from "framer-plugin";
 import { ConfigType } from "./App";
+import { Info } from "./components/Icons";
+import { Tooltip } from "./components/Tooltip";
 
 type ConfigProps = {
   config: ConfigType | null;
   updateConfig: React.Dispatch<React.SetStateAction<ConfigType>>;
 };
 
-export function Config({ config, updateConfig }: ConfigProps) {
+export function Settings({ config, updateConfig }: ConfigProps) {
   const [localConfig, setLocalConfig] = useState<ConfigType>({
     apiHost: config?.apiHost || "https://cdn.growthbook.io",
     clientKey: config?.clientKey || "",
@@ -72,12 +74,17 @@ export function Config({ config, updateConfig }: ConfigProps) {
 
   return (
     <div className="gb-container">
-      <h2>Settings</h2>
-
       <div>
-        <label htmlFor="client-key" className="gb-label">
-          Client Key
-        </label>
+        <div className="gb-label-tooltip-container">
+          <label htmlFor="client-key" className="gb-label">
+            Client Key
+          </label>
+          <Tooltip id="client-key">
+            How you connect to GrowthBook. Found in{" "}
+            <strong>SDK Connections</strong>
+          </Tooltip>
+        </div>
+
         <input
           id="client-key"
           type="text"
@@ -89,9 +96,15 @@ export function Config({ config, updateConfig }: ConfigProps) {
         />
       </div>
       <div>
-        <label htmlFor="api-host" className="gb-label">
-          API Host
-        </label>
+        <div className="gb-label-tooltip-container">
+          <label htmlFor="api-host" className="gb-label">
+            API Host
+          </label>
+          <Tooltip id="api-host">
+            Update this if you're self-hosting GrowthBook.
+          </Tooltip>
+        </div>
+
         <input
           id="api-host"
           type="text"
@@ -102,7 +115,9 @@ export function Config({ config, updateConfig }: ConfigProps) {
         />
       </div>
 
-      <button onClick={handleSave}>Save Settings</button>
+      <button className="framer-button-primary" onClick={handleSave}>
+        Save Settings
+      </button>
     </div>
   );
 }
