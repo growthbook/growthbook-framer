@@ -1,5 +1,4 @@
 /* Your Plugin CSS */
-
 main {
   display: flex;
   flex-direction: column;
@@ -29,8 +28,9 @@ label {
 
 /* New styles converted from styles.ts */
 .gb-label {
-  font-size: 11px;
-  color: var(--framer-color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
   margin-bottom: 4px;
   display: block;
   width: max-content;
@@ -38,11 +38,27 @@ label {
 
 .gb-input {
   width: 100%;
+  margin-block-start: 5px;
+  border-radius: 8px;
 }
 
 .gb-select {
   width: 100%;
   background-color: var(--framer-color-bg-tertiary);
+  margin-block-start: 5px;
+}
+
+.gb-link-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  font-weight: 600;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .gb-container {
@@ -50,8 +66,8 @@ label {
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  padding-block: 24px;
-  border-top: 1px solid var(--framer-color-divider);
+  padding-block: 13px;
+  /* border-top: 1px solid var(--framer-color-divider); */
 }
 
 .gb-container:last-of-type {
@@ -69,6 +85,73 @@ label {
   }
 }
 
+/* Tooltip */
+.gb-label-tooltip-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  label {
+    margin-block-end: 0;
+  }
+}
+
+.gb-tooltip-container {
+  position: relative;
+}
+
+.gb-tooltip-icon {
+  svg {
+    width: 16px;
+    height: 16px;
+    color: #6550b9;
+  }
+}
+
+.gb-tooltip-content {
+  /* position: absolute;
+  top: 0;
+  left: -16px;
+  translate: 0 calc(-100% - 6px); */
+  background-color: var(--framer-color-text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: max-content;
+  max-width: 200px;
+
+  &::after {
+    bottom: -6px;
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--framer-color-text);
+  }
+
+  &[data-position="left"]::after {
+    left: 12px;
+  }
+
+  &[data-position="right"]::after {
+    right: 12px;
+  }
+
+  &[data-position="center"]::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  p {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--framer-color-text-reversed);
+    text-wrap: pretty;
+  }
+}
+
+/* Intro */
 .gb-intro {
   justify-content: center;
   gap: 10px;
@@ -84,6 +167,17 @@ label {
 .gb-intro-text {
   font-size: smaller;
   color: var(--framer-color-text-tertiary);
+}
+
+.gb-intro-text a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gb-intro-text svg {
+  width: 16px;
+  height: 16px;
 }
 
 .gb-info-text {
@@ -125,4 +219,68 @@ label {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Accordion  */
+.accordion {
+  width: 100%;
+}
+
+.accordion-title {
+}
+
+.accordion-button {
+  all: unset;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  display: flex;
+  gap: 10px;
+
+  &:hover,
+  &:focus {
+    background-color: transparent;
+  }
+}
+
+.accordion-item {
+  margin-block: 13px 20px;
+  border-bottom: 1px solid var(--framer-color-divider);
+  padding-block-end: 16px;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.accordion-button:hover {
+}
+
+.accordion-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Section Header */
+.gb-section-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    color: #3a5bc7;
+  }
+}
+
+.gb-section-header-title {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
 }
