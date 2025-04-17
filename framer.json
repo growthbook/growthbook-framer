@@ -1,8 +1,6 @@
 {
   "id": "331bb3",
   "name": "Growthbook",
-  "modes": [
-    "canvas"
-  ],
-  "icon": "/icon.svg"
+  "modes": ["canvas"],
+  "icon": "/growthbook-logo.svg"
 }

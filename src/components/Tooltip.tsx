@@ -22,6 +22,7 @@ export function Tooltip({
   const [tooltipState, setTooltipState] = useState({
     position: { top: 0, left: 0 },
     alignment: "left" as TooltipAlignment,
+    "--triangle": "",
   });
 
   const iconRef = useRef<HTMLSpanElement>(null);
@@ -32,31 +33,33 @@ export function Tooltip({
       const iconRect = iconRef.current.getBoundingClientRect();
       const contentRect = contentRef.current.getBoundingClientRect();
       const mainRectWidth = 320;
-      const margin = 10;
-
+      const margin = iconRect.width * 2;
+      const triangleWidth = 6;
       const isLeft = iconRect.left - margin + contentRect.width < mainRectWidth;
       const isRight = iconRect.right - margin - contentRect.width > 0;
 
-      let top, left;
+      const top = iconRect.top - contentRect.height - 6;
+      let left, triangle;
       let alignment: TooltipAlignment;
 
       if (isLeft) {
-        top = iconRect.top - contentRect.height - 6;
         left = iconRect.left - margin;
         alignment = "left";
+        triangle = `${iconRect.width / 2 + margin - triangleWidth}px`;
       } else if (isRight) {
-        top = iconRect.top - contentRect.height - 6;
-        left = iconRect.right - contentRect.width + margin;
+        left = iconRect.left - contentRect.width + margin / 1.5;
         alignment = "right";
+        triangle = `${margin / 1.5 - triangleWidth - iconRect.width / 2}px`;
       } else {
-        top = iconRect.top - contentRect.height - 6;
         left = iconRect.left + iconRect.width / 2 - contentRect.width / 2;
         alignment = "center";
+        triangle = "";
       }
 
       setTooltipState({
         position: { top, left },
         alignment,
+        "--triangle": triangle,
       });
     }
   }, [visible]);
@@ -90,6 +93,7 @@ export function Tooltip({
             position: "fixed",
             top: `${tooltipState.position.top}px`,
             left: `${tooltipState.position.left}px`,
+            ["--triangle" as string]: tooltipState["--triangle"],
           }}
         >
           <p>{children}</p>

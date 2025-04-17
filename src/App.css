@@ -1,4 +1,20 @@
 /* Your Plugin CSS */
+/* Only apply in dark mode */
+[data-framer-theme="dark"] main {
+  --logo-color: #fff;
+  --logo-teal: #fff;
+  --logo-purple: #fff;
+  --logo-blue: #fff;
+}
+
+/* Only apply in light mode */
+[data-framer-theme="light"] main {
+  --logo-color: #1f2d5c;
+  --logo-teal: #029dd1;
+  --logo-purple: #4817a1;
+  --logo-blue: #0047bd;
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -102,17 +118,18 @@ label {
 
 .gb-tooltip-icon {
   svg {
-    width: 16px;
-    height: 16px;
-    color: #6550b9;
+    width: 12px;
+    height: 12px;
+    color: var(--framer-color-tint);
   }
 }
 
+#gb-refresh-icon {
+  width: 16px;
+  height: 16px;
+}
+
 .gb-tooltip-content {
-  /* position: absolute;
-  top: 0;
-  left: -16px;
-  translate: 0 calc(-100% - 6px); */
   background-color: var(--framer-color-text);
   padding: 4px 8px;
   border-radius: 4px;
@@ -131,11 +148,11 @@ label {
   }
 
   &[data-position="left"]::after {
-    left: 12px;
+    left: var(--triangle);
   }
 
   &[data-position="right"]::after {
-    right: 12px;
+    right: var(--triangle);
   }
 
   &[data-position="center"]::after {
@@ -146,7 +163,7 @@ label {
   p {
     font-size: 12px;
     line-height: 16px;
-    color: var(--framer-color-text-reversed);
+    color: var(--framer-color-bg);
     text-wrap: pretty;
   }
 }
@@ -226,9 +243,6 @@ label {
   width: 100%;
 }
 
-.accordion-title {
-}
-
 .accordion-button {
   all: unset;
   background-color: transparent;
@@ -258,9 +272,6 @@ label {
   }
 }
 
-.accordion-button:hover {
-}
-
 .accordion-button svg {
   width: 16px;
   height: 16px;
@@ -275,7 +286,6 @@ label {
   svg {
     width: 15px;
     height: 15px;
-    color: #3a5bc7;
   }
 }
 

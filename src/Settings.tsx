@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { framer } from "framer-plugin";
 import { ConfigType } from "./App";
-import { Info } from "./components/Icons";
 import { Tooltip } from "./components/Tooltip";
 
 type ConfigProps = {
@@ -15,7 +14,7 @@ export function Settings({ config, updateConfig }: ConfigProps) {
     clientKey: config?.clientKey || "",
   });
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function focusInput() {
     inputRef?.current?.focus();
@@ -68,8 +67,6 @@ export function Settings({ config, updateConfig }: ConfigProps) {
         durationMs: 2000,
       });
     }
-
-    // Show success message
   }
 
   return (
