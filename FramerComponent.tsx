@@ -64,9 +64,10 @@ const Badge = ({ current, total }: { current: number; total: number }) => {
  */
 export default function GrowthBook(props: Props) {
   const [variant, setVariant] = useState<number>(0);
-
   const [isMounted, setIsMounted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const controlAndVariants = [...props.control, ...props.variants];
   const isCanvas = RenderTarget.current() === RenderTarget.canvas;
   const isThumbnail = RenderTarget.current() === RenderTarget.thumbnail;
 
@@ -170,8 +171,7 @@ export default function GrowthBook(props: Props) {
   }
 
   // Runtime view
-  const { variants = [] } = props;
-  if (!variants.length || !props.flagKey) {
+  if (!controlAndVariants.length || !props.flagKey) {
     return null;
   }
 
@@ -184,8 +184,8 @@ export default function GrowthBook(props: Props) {
       }}
     >
       {!isMounted || !window._growthbook
-        ? variants[0]
-        : variants[variant] || variants[0]}
+        ? controlAndVariants[0]
+        : controlAndVariants[variant] || controlAndVariants[0]}
     </div>
   );
 }

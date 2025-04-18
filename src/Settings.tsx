@@ -98,7 +98,7 @@ export function Settings({ config, updateConfig }: ConfigProps) {
             API Host
           </label>
           <Tooltip id="api-host">
-            Update this if you're self-hosting GrowthBook.
+            Update this if you're self-hosting GrowthBook
           </Tooltip>
         </div>
 
