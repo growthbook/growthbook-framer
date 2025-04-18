@@ -8,7 +8,7 @@ export function GetStarted() {
         variants. Then, return to Framer to connect your Feature Flag and map
         components to those variants.
       </p>
-      <a className="gb-link-button" href="https://growthbook.io/docs/">
+      <a className="gb-link-button" href="https://docs.growthbook.io/">
         View GrowthBook Docs <ExternalLink />
       </a>
     </div>
