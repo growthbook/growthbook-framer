@@ -11,6 +11,8 @@ export function GetStarted() {
       <a
         className="gb-link-button"
         href="https://docs.growthbook.io/integrations/framer"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         View GrowthBook Docs <ExternalLink />
       </a>

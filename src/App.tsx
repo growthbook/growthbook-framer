@@ -64,7 +64,7 @@ export function App() {
       }
     }
     setCode();
-  }, [config.clientKey]); // Only depend on clientKey since that's what triggers the script injection
+  }, [config.clientKey, config.apiHost]); // Include both config values in dependencies
 
   const items = useMemo(
     () => [
@@ -109,6 +109,7 @@ export function App() {
         <p className="gb-intro-text">
           <a
             target="_blank"
+            rel="noopener noreferrer"
             href={`${parseGrowthBookUrl(config.apiHost)}`}
             className="gb-link-button"
           >

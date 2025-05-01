@@ -4,7 +4,7 @@ import { ConfigType } from "./App";
 import { FeatureApiResponse } from "@growthbook/growthbook-react";
 import { framer } from "framer-plugin";
 import { Tooltip } from "./components/Tooltip";
-import { ExternalLink, Flask, Refresh } from "./components/Icons";
+import { ExternalLink, Refresh } from "./components/Icons";
 import { parseGrowthBookUrl } from "./utils";
 
 export interface Feature<T> {
@@ -22,6 +22,7 @@ function CreateFeatureLink({ config }: { config: ConfigType }) {
         className="gb-link-button"
         href={`${parseGrowthBookUrl(config.apiHost)}/features/`}
         target="_blank"
+        rel="noopener noreferrer"
       >
         Create Feature
         <ExternalLink />

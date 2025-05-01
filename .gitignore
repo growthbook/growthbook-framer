@@ -30,4 +30,5 @@ yarn-error.log\*
 
 # Packed plugin
 
-plugin.zip
+*.tgz
+*.zip
