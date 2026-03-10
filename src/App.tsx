@@ -52,7 +52,7 @@ export function App() {
   useEffect(() => {
     async function setCode() {
       if (config.clientKey) {
-        const script = `<script async data-api-host="${config.apiHost}" data-client-key="${config.clientKey}" src="https://cdn.jsdelivr.net/npm/@growthbook/growthbook/dist/bundles/auto.min.js"></script>`;
+        const script = `<script async data-api-host="${config.apiHost}" data-client-key="${config.clientKey}" data-tracking="gtag,gtm,segment,growthbook" src="https://cdn.jsdelivr.net/npm/@growthbook/growthbook/dist/bundles/auto.min.js"></script>`;
         const customCode = await framer.getCustomCode();
         if (customCode.headStart.html === script) {
           return;
