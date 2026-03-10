@@ -20,6 +20,7 @@ interface Props {
   variants: React.ReactNode[];
   variantCount: number;
   control: string;
+  style?: React.CSSProperties;
 }
 
 const FlaskIcon = ({ width = 32, height = 32 }) => (
@@ -61,6 +62,8 @@ const Badge = ({ current, total }: { current: number; total: number }) => {
 
 /**
  * @framerDisableUnlink
+ * @framerSupportedLayoutWidth any
+ * @framerSupportedLayoutHeight any
  */
 export default function GrowthBook(props: Props) {
   const [variant, setVariant] = useState<number>(0);
@@ -176,18 +179,27 @@ export default function GrowthBook(props: Props) {
   }
 
   // TODO? Add support for null states/kill switches?
-  return (
-    <div
-      style={{
+  const activeVariant =
+    !isMounted || !window._growthbook
+      ? controlAndVariants[0]
+      : controlAndVariants[variant] || controlAndVariants[0];
+
+  if (!activeVariant) return null;
+
+  // Render the variant directly without a wrapper div so it sits in Framer's
+  // layout tree and retains access to page-level breakpoints / responsive props.
+  if (React.isValidElement(activeVariant)) {
+    return React.cloneElement(activeVariant as React.ReactElement<any>, {
+      style: {
+        ...(activeVariant as React.ReactElement<any>).props?.style,
         opacity: isLoaded ? 1 : 0,
         transition: "opacity 0.2s ease-in",
-      }}
-    >
-      {!isMounted || !window._growthbook
-        ? controlAndVariants[0]
-        : controlAndVariants[variant] || controlAndVariants[0]}
-    </div>
-  );
+        ...props.style,
+      },
+    });
+  }
+
+  return activeVariant as React.ReactElement;
 }
 
 // Property Controls for Framer UI

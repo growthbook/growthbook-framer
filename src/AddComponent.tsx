@@ -10,7 +10,7 @@ interface AddComponentProps {
 export function AddComponent({ config, feature }: AddComponentProps) {
   const addComponent = async () => {
     const node = await framer.addComponentInstance({
-      url: "https://framer.com/m/GrowthBook-FBIs.js",
+      url: "https://framer.com/m/GrowthBook-HEaLUQ.js@FLeSg850alts6Wo1wEbm",
       attributes: {
         controls: {
           apiHost: config.apiHost,
